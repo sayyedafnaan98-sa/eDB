@@ -1,0 +1,76 @@
+name: Weekly Comprehensive Tests
+
+on:
+  schedule:
+    - cron: '0 6 * * 0'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  full-test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.11", "3.12"]
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v7
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: pip install -e ".[dev]"
+
+      - name: Full test suite with coverage
+        run: pytest --cov=edb --cov-report=xml --cov-report=term-missing -v --tb=long
+
+      - name: Security audit - dependencies
+        run: |
+          # Audit before installing safety: safety pulls in nltk, which
+          # pip-audit then flags (PYSEC-2026-3740) even though it is the
+          # audit tool's dependency, not eDB's. Upgrade the base env's
+          # setuptools first for the same reason (PYSEC-2026-3447).
+          pip install --upgrade setuptools
+          pip install pip-audit
+          pip-audit --skip-editable
+          pip install safety
+          safety check || true
+
+      - name: Check for hardcoded secrets
+        run: |
+          pip install detect-secrets
+          detect-secrets scan --all-files --force-use-all-plugins 2>&1 | \
+            grep -v "ArtifactoryDetector\|AWSKeyDetector" || true
+
+      - name: SAST scan
+        run: |
+          pip install bandit
+          bandit -r src/edb/ -ll -ii || true
+
+  frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Use Node.js 22.x
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.x
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Type check
+        run: npx tsc --noEmit
+
+      - name: Build
+        run: npm run build
