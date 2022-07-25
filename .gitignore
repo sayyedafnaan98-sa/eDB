@@ -1,0 +1,27 @@
+# Node
+node_modules/
+dist/
+*.local
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+*.egg
+.eggs/
+build/
+*.db
+.env
+.venv/
+venv/
+htmlcov/
+.coverage
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+
+# OS
+.DS_Store
+build-*/
+*.pyc
+target/
