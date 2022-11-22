@@ -1,0 +1,29 @@
+{
+  "name": "edb",
+  "private": true,
+  "version": "3.0.1",
+  "type": "module",
+  "description": "Lightweight embedded database manager with SQL editor, AI-powered query assistance, and multi-model storage",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "react": "^19.1.0",
+    "react-dom": "^19.2.8"
+  },
+  "devDependencies": {
+    "@types/react": "^19.1.0",
+    "@types/react-dom": "^19.2.5",
+    "@vitejs/plugin-react": "^4.4.1",
+    "typescript": "~5.7.2",
+    "vite": "^6.3.1",
+    "vitest": "^2.0.0",
+    "@testing-library/react": "^16.0.0",
+    "@testing-library/jest-dom": "^6.5.0",
+    "jsdom": "^25.0.0"
+  }
+}
