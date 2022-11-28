@@ -1,0 +1,93 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "edb"
+version = "3.0.1"
+description = "eDB: Unified Multi-Model Database Ecosystem"
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.11"
+authors = [
+    {name = "eDB Contributors"},
+]
+keywords = ["database", "multi-model", "embedded", "sql", "nosql", "key-value"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Database",
+    "Topic :: Database :: Database Engines/Servers",
+]
+
+dependencies = [
+    "fastapi>=0.110.0",
+    "uvicorn[standard]>=0.27.0",
+    "pydantic>=2.13.5",
+    "pydantic-settings>=2.1.0",
+    "PyJWT>=2.8.0",
+    "bcrypt>=4.1.0",
+    "cryptography>=50.0.1",
+    "python-multipart>=0.0.9",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=9.1.1",
+    "pytest-cov>=4.1.0",
+    "pytest-asyncio>=0.23.0",
+    "httpx>=0.27.0",
+    "ruff>=0.16.5",
+    "mypy>=2.3.1",
+]
+ebot = [
+    "openai>=1.12.0",
+]
+
+[project.scripts]
+edb = "edb.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/embeddedos-org/eDB"
+Documentation = "https://github.com/embeddedos-org/eDB/tree/main/docs"
+Repository = "https://github.com/embeddedos-org/eDB"
+Issues = "https://github.com/embeddedos-org/eDB/issues"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-v --tb=short"
+asyncio_mode = "auto"
+
+[tool.ruff]
+target-version = "py311"
+line-length = 100
+src = ["src"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "N", "UP", "B", "SIM", "RUF"]
+ignore = ["E501"]
+
+[tool.mypy]
+python_version = "3.11"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+check_untyped_defs = true
+
+# Tests, backup tests, and example/runner scripts are not shipped; they are
+# still body-checked (check_untyped_defs) but are not required to carry full
+# annotations (251 no-untyped-def errors on master). The shipped package in
+# src/edb keeps the strict setting above.
+[[tool.mypy.overrides]]
+module = ["tests.*", "run_all_tests", "quickstart",
+    "test_audit", "test_database", "test_document", "test_encryption",
+    "test_fts", "test_graph", "test_input_validation", "test_jwt",
+    "test_keyvalue", "test_parser", "test_planner", "test_rbac",
+    "test_relational", "test_sanitizer", "test_translator", "test_users"]
+disallow_untyped_defs = false
